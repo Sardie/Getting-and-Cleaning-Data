@@ -143,13 +143,13 @@ run_analysis <- function() {
         elements_train_data <- cbind(body_acc_x_train, body_acc_y_train, body_acc_z_train, body_gyro_x_train, body_gyro_y_train, body_gyro_z_train, total_acc_x_train, total_acc_y_train, total_acc_z_train)
                 
         ## averages and stores value in each of the 128 vector columns type data
-        
+        #/
         
         ## merge test data
         test_data <- cbind(subjects_test, test_activity, x_test, type_test, elements_test_data) ## 
         
         ## merge train data
-        train_data <- cbind(subjects_train, train_activity, x_train, type_train, elements_train_data)  ## )
+        train_data <- cbind(subjects_train, train_activity, x_train, type_train, elements_train_data)  ## 
         
         ## merge both test and train data
         full_data <- rbind(test_data, train_data)
