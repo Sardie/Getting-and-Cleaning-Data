@@ -40,18 +40,18 @@ run_analysis <- function() {
         names(x_train) <- features[,2]
         names(subjects_test) <- "Subject_ID"
         names(subjects_train) <- "Subject_ID"
-        names(y_test) <- "Posture_ID"
-        names(y_train) <- "Posture_ID"
-        names(activity_labels) <- c("Posture_ID", "Posture")
+        names(y_test) <- "Activity_ID"
+        names(y_train) <- "Activity_ID"
+        names(activity_labels) <- c("Activity_ID", "Activity")
         
         ## prep datasets for merging
         y_test <- merge(y_test, activity_labels)
-        test_posture <- as.data.frame(y_test[,2])
+        test_activity <- as.data.frame(y_test[,2])
         y_train <- merge(y_train, activity_labels)
-        train_posture <- as.data.frame(y_train[,2])
+        train_activity <- as.data.frame(y_train[,2])
         
-        names(test_posture) <- "Posture"
-        names(train_posture) <- "Posture"
+        names(test_activity) <- "Activity"
+        names(train_activity) <- "Activity"
         
         type_test <- rep("test", times=nrow(x_test))
         type_test <- as.data.frame(type_test)
@@ -146,10 +146,10 @@ run_analysis <- function() {
         
         
         ## merge test data
-        test_data <- cbind(subjects_test, test_posture, x_test, type_test, elements_test_data) ## 
+        test_data <- cbind(subjects_test, test_activity, x_test, type_test, elements_test_data) ## 
         
         ## merge train data
-        train_data <- cbind(subjects_train, train_posture, x_train, type_train, elements_train_data)  ## )
+        train_data <- cbind(subjects_train, train_activity, x_train, type_train, elements_train_data)  ## )
         
         ## merge both test and train data
         full_data <- rbind(test_data, train_data)
@@ -157,5 +157,18 @@ run_analysis <- function() {
         mean_index <- grep("-mean()", names(full_data))
         
         full_data_mean_std <- cbind(full_data[1:2], full_data[std_index], full_data[mean_index])
+        
+        full_data_mean_std$SubjectAct <- paste(full_data_mean_std$Subject_ID, full_data_mean_std$Activity, sep="-")
+        
+        full_data_mean_std <- full_data_mean_std[,3:ncol(full_data_mean_std)]
+        library(reshape2)
+        full_data_mean_std_melt <- melt(full_data_mean_std, id=c("SubjectAct"))
+        full_data_mean_std_melt <- dcast(full_data_mean_std_melt, SubjectAct~variable, mean)
+        library(tidyr)
+        full_data_mean_std_melt <- separate(full_data_mean_std_melt, SubjectAct, c("Subject_ID", "Activity"), sep="-")
+        full_data_mean_std_melt$Subject_ID <- as.numeric(full_data_mean_std_melt$Subject_ID) 
+        full_data_mean_std_melt <- full_data_mean_std_melt[order(full_data_mean_std_melt$Subject_ID, full_data_mean_std_melt$Activity),]
+        write.table(full_data_mean_std_melt, "./Tidy_data.txt", row.name = FALSE)
+        
         
 }
